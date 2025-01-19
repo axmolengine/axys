@@ -152,7 +152,7 @@ public:
   }
 
   binary_reader_impl& operator=(const binary_reader_impl&) = delete;
-  binary_reader_impl& operator=(binary_reader_impl&&) = delete;
+  binary_reader_impl& operator=(binary_reader_impl&&)      = delete;
 
   /* read 7bit encoded variant integer value
   ** @dotnet BinaryReader.Read7BitEncodedInt(64)
@@ -188,6 +188,21 @@ public:
       oav.resize(len);
       read_bytes(&oav.front(), len);
     }
+  }
+  template <typename _Ty>
+  size_t read_any(_Ty& out)
+  {
+    return read_any(&out, static_cast<int>(sizeof(_Ty)), 1);
+  }
+  template <typename _Ty, size_t _N>
+  size_t read_any(_Ty (&out)[_N])
+  {
+    return read_any(out, static_cast<int>(sizeof(_Ty)), static_cast<int>(_N));
+  }
+  size_t read_any(void* out, int item_size, int item_count)
+  {
+    read_bytes(out, item_size * item_count);
+    return item_count;
   }
   void read_bytes(void* oav, int len)
   {
